@@ -38,7 +38,13 @@ def main() -> None:
     top = scored.sort_values("risk_score", ascending=False).head(25).copy()
     top["explanations"] = top.apply(lambda r: explain_top_reasons(r, top_k=3), axis=1)
 
-    # Save a recruiter-friendly sample CSV
+    # Optional ATT&CK summary string (nice for SOC readability)
+    top["attack_summary"] = top.apply(
+        lambda r: f'{r["attack_tactic"]} / {r["attack_technique"]} ({r["attack_technique_id"]})',
+        axis=1
+    )
+
+    # Save a recruiter-friendly sample CSV + JSON
     sample_cols = [
         "alert_id",
         "timestamp",
@@ -47,13 +53,20 @@ def main() -> None:
         "event_type",
         "port",
         "severity",
+
+        # MITRE ATT&CK
+        "attack_tactic",
+        "attack_technique",
+        "attack_technique_id",
+        "attack_summary",
+
         "risk_score",
         "risk_level",
         "explanations",
     ]
+
     write_csv(top[sample_cols], paths.sample_scored_csv)
 
-    # Save JSON (list of objects)
     json_obj = top[sample_cols].to_dict(orient="records")
     write_json(json_obj, paths.sample_scored_json)
 

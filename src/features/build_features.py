@@ -1,8 +1,8 @@
 from __future__ import annotations
-import numpy as np
 import pandas as pd
 
-from src.config import Paths, FeatureSettings, ScoringSettings
+from src.config import FeatureSettings, Paths, ScoringSettings
+from src.mitre.attack_mapping import map_event_to_attack
 from src.utils.io import read_csv, write_csv
 from src.utils.time import to_datetime
 
@@ -14,6 +14,14 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["timestamp_dt"] = to_datetime(df["timestamp"])
     df = df.sort_values("timestamp_dt").reset_index(drop=True)
+
+    # -------------------------
+    # MITRE ATT&CK mapping
+    # -------------------------
+    mapped = df["event_type"].map(map_event_to_attack)
+    df["attack_tactic"] = mapped.map(lambda x: x.tactic)
+    df["attack_technique"] = mapped.map(lambda x: x.technique)
+    df["attack_technique_id"] = mapped.map(lambda x: x.technique_id)
 
     # Unusual hour feature
     df["hour"] = df["timestamp_dt"].dt.hour
@@ -34,7 +42,6 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     out = []
     for ip, g in df.groupby("source_ip", sort=False):
         g = g.sort_values("timestamp_dt")
-        # Set index to time for rolling window
         g = g.set_index("timestamp_dt")
         g["failed_count_last_window"] = g["is_failed_login"].rolling(window).sum().fillna(0).astype(int)
         g = g.reset_index()
@@ -43,14 +50,13 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.concat(out, ignore_index=True).sort_values("timestamp_dt").reset_index(drop=True)
 
     # Mock “IP reputation” score: repeat offenders get higher rep score
-    # (You can later replace with real intel feeds)
     ip_counts = df["source_ip"].value_counts()
     df["ip_repeat_score"] = df["source_ip"].map(lambda x: float(ip_counts.get(x, 1)))
+
     # normalize 0..1
     max_c = df["ip_repeat_score"].max()
     df["ip_repeat_score"] = (df["ip_repeat_score"] / max_c).clip(0, 1)
 
-    # Keep only needed columns for next steps
     feat_cols = [
         "alert_id",
         "timestamp",
@@ -60,12 +66,20 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
         "port",
         "severity",
         "username",
+
+        # MITRE ATT&CK
+        "attack_tactic",
+        "attack_technique",
+        "attack_technique_id",
+
+        # features
         "failed_count_last_window",
         "is_unusual_hour",
         "is_high_risk_port",
         "ip_repeat_score",
         "severity_num",
     ]
+
     return df[feat_cols]
 
 
