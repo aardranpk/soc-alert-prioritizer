@@ -55,6 +55,35 @@ def plot_high_risk_examples(df: pd.DataFrame, out_path: str) -> None:
     plt.close()
 
 
+def plot_top_attack_techniques(df: pd.DataFrame, out_path: str, top_n: int = 10) -> None:
+    """
+    Shows the most frequent ATT&CK techniques among HIGH risk alerts.
+    Requires columns: attack_technique_id, attack_technique (from MITRE mapping).
+    """
+    ensure_parent_dir(out_path)
+
+    high = df[df["risk_level"] == "HIGH"].copy()
+
+    # If for some reason there are no HIGH alerts, fall back to all alerts
+    if high.empty:
+        high = df.copy()
+
+    # Build label like "T1110 Brute Force"
+    label = high["attack_technique_id"].astype(str) + " " + high["attack_technique"].astype(str)
+
+    counts = label.value_counts().head(top_n)
+
+    plt.figure()
+    plt.bar(counts.index.astype(str), counts.values)
+    plt.title(f"Top MITRE ATT&CK Techniques (Top {top_n})")
+    plt.xlabel("technique")
+    plt.ylabel("alert count")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=160)
+    plt.close()
+
+
 def main() -> None:
     paths = Paths()
     df = read_csv(paths.processed_scored_csv)
@@ -62,10 +91,12 @@ def main() -> None:
     plot_score_distribution(df, paths.fig_score_dist)
     plot_top_reasons_mean(df, paths.fig_top_reasons)
     plot_high_risk_examples(df, paths.fig_high_risk_examples)
+    plot_top_attack_techniques(df, paths.fig_top_attack_techniques, top_n=10)
 
     print(f"[OK] Wrote figure: {paths.fig_score_dist}")
     print(f"[OK] Wrote figure: {paths.fig_top_reasons}")
     print(f"[OK] Wrote figure: {paths.fig_high_risk_examples}")
+    print(f"[OK] Wrote figure: {paths.fig_top_attack_techniques}")
 
 
 if __name__ == "__main__":

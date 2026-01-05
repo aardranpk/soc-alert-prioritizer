@@ -12,6 +12,7 @@ class Paths:
     fig_score_dist: str = "reports/figures/score_distribution.png"
     fig_top_reasons: str = "reports/figures/top_reasons.png"
     fig_high_risk_examples: str = "reports/figures/high_risk_alert_examples.png"
+    fig_top_attack_techniques: str = "reports/figures/top_attack_techniques.png"
 
 
 @dataclass(frozen=True)
