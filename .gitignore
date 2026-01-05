@@ -1,0 +1,46 @@
+# =========================
+# Python cache / bytecode
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# =========================
+# Virtual environments
+# =========================
+.venv/
+venv/
+ENV/
+
+# =========================
+# OS / Editor files
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# Generated data (reproducible)
+# =========================
+data/raw/
+data/processed/
+
+# =========================
+# Logs / temporary files
+# =========================
+*.log
+*.tmp
+
+# =========================
+# Jupyter (if ever used)
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Build / distribution
+# =========================
+build/
+dist/
+*.egg-info/
