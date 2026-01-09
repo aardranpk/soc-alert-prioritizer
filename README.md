@@ -9,7 +9,7 @@ This project simulates a **real SOC alert triage pipeline** that:
 - Assigns **risk scores** using explainable rule-based logic
 - Produces **human-readable explanations** for each alert
 - Visualizes alert risk distribution and contributing factors
-- MITRE ATT&CK tactic/technique mapping for alert taxonomy
+
 
 The goal is to demonstrate **SOC analyst decision-making**, not just model accuracy.
 
@@ -22,6 +22,7 @@ The goal is to demonstrate **SOC analyst decision-making**, not just model accur
 - Explainable alert prioritization (why an alert is risky)
 - Analyst-friendly CSV, JSON, and visual outputs
 - End-to-end pipeline runnable with a single command
+- MITRE ATT&CK tactic/technique mapping for alert taxonomy
 
 ---
 
