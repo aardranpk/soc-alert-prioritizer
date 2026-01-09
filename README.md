@@ -9,6 +9,7 @@ This project simulates a **real SOC alert triage pipeline** that:
 - Assigns **risk scores** using explainable rule-based logic
 - Produces **human-readable explanations** for each alert
 - Visualizes alert risk distribution and contributing factors
+- MITRE ATT&CK tactic/technique mapping for alert taxonomy
 
 The goal is to demonstrate **SOC analyst decision-making**, not just model accuracy.
 
@@ -92,6 +93,11 @@ python -m src.main
     "High-risk port targeted"
   ]
 }
+## ATT&CK Techniques in High-Risk Alerts
+
+Below is a visualization of the most common MITRE ATT&CK techniques among high risk alerts:
+
+![Top ATT&CK Techniques](reports/figures/top_attack_techniques.png)
 
 ### Generated Artifacts
 - reports/sample_outputs/scored_alerts_sample.csv
@@ -107,7 +113,7 @@ python -m src.main
 - Easy to extend with threat intelligence or ATT&CK mapping
 
 ## Planned Enhancements
-- MITRE ATT&CK technique mapping
-- Alert suppression & false-positive reduction
-- Analyst queue simulation
-- ML-assisted scoring (optional)
+- SIEM-style export (Splunk/Elastic-ready JSON)
+- Alert suppression / false-positive reduction rules
+- Analyst investigation queue (ranked worklist + SLA)
+- ML-assisted scoring
